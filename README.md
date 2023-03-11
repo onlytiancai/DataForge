@@ -13,3 +13,10 @@ DataForge: Build better insights from your data.
 - [ ] 找一个能获取 MySQL 元数据的 js 库
 - [ ] 写一个最简单的 VS Code 的插件 Demo
 - [ ] 设置 Github Actions 自动测试
+
+## 对标产品
+
+- [SQLyog](https://webyog.com/product/sqlyog/)
+- [Navicat](https://www.navicat.com/en/products/navicat-for-mysql)
+- [DBeaver](https://dbeaver.io/)
+- [Sequel Pro](https://sequelpro.com/)
