@@ -3,24 +3,36 @@ import { ref } from 'vue'
 
 const output = ref('')  // 用于存储 API 返回的结果
 
+
 const runCommand = async () => {
+  output.value = ''  // 每次运行命令时，先清空输出
+  
   try {
-    // 使用 useFetch 调用 FastAPI 的 API
-    const { data, error } = await useFetch('/api/run-mysqlsh-help/')
+    // 使用 fetch API 调用 FastAPI 流式输出
+    const response = await fetch('/api/run-mysqlsh-help');
     
-    if (error.value) {
-      // 如果有错误，打印并显示错误信息
-      console.error(error.value)
-      output.value = `Error: ${error.value.data.detail || error.value.message}`
-    } else {
-      // 成功调用后，将返回的数据赋给 output
-      output.value = data.value.output
+    if (!response.ok) {
+      output.value = `Error: ${response.statusText}`;
+      return;
     }
-  } catch (e) {
-    console.error(e)
-    output.value = `Unexpected error: ${e.message}`
+
+    // 处理流式响应
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+
+    let done = false;
+    while (!done) {
+      const { value, done: streamDone } = await reader.read();
+      done = streamDone;
+      // 解码并追加流数据
+      output.value += decoder.decode(value, { stream: true });
+    }
+  } catch (error) {
+    console.error(error);
+    output.value = `Error: ${error.message}`;
   }
 }
+
 // 清空输出
 const clearOutput = () => {
   output.value = ''

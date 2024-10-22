@@ -1,29 +1,36 @@
 import subprocess
 from fastapi import FastAPI, HTTPException
-from typing import Union
+from starlette.responses import StreamingResponse
+import time
 
 app = FastAPI()
+
+# 生成器函数，用于逐行返回命令的输出
+def run_command():
+    process = subprocess.Popen(
+        ["mysqlsh", "--help"], 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.STDOUT,  # 捕获标准错误并将其与标准输出合并
+        text=True, 
+        bufsize=1  # 行缓冲
+    )
+    
+    # 逐行读取并返回命令输出
+    for line in iter(process.stdout.readline, ''):        
+        yield line
+        time.sleep(0.1)
+    
+    process.stdout.close()
+    process.wait()
+
+    if process.returncode != 0:
+        yield f"\nCommand exited with return code {process.returncode}"
 
 @app.get("/api/run-mysqlsh-help/")
 async def run_mysqlsh_help():
     try:
-        # 执行 'mysqlsh --help' 命令
-        result = subprocess.run(
-            ["mysqlsh", "--help"], 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE, 
-            text=True
-        )
-        
-        # 如果命令执行失败，返回错误信息
-        if result.returncode != 0:
-            raise HTTPException(status_code=500, detail=f"Error executing command: {result.stderr}")
-        
-        # 返回命令输出
-        return {"output": result.stdout}
+        return StreamingResponse(run_command(), media_type="text/plain")
     except FileNotFoundError:
-        # 如果系统中没有安装 mysqlsh，返回错误信息
         raise HTTPException(status_code=404, detail="mysqlsh command not found")
     except Exception as e:
-        # 处理其他异常
         raise HTTPException(status_code=500, detail=str(e))
