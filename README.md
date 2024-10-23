@@ -18,3 +18,9 @@ Manage and maintain data in MySQL, including backups, restores, imports, exports
 - Full and incremental synchronization of specified tables to Clickhouse.
 - Full and incremental synchronization of specified tables to Elasticsearch.
 - Schedule data task.
+
+## run
+
+    celery -A celery_app worker --loglevel=info
+    uvicorn main:app --reload
+
