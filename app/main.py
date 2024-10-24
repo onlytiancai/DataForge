@@ -1,5 +1,7 @@
 
 from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
 from celery.result import AsyncResult
 from celery_app import celery_app
 from celery_app import run_command
@@ -7,6 +9,26 @@ from celery_app import run_command
 
 app = FastAPI()
 
+class UserInfo(BaseModel):
+    roles: List[str] = []
+    realName: str
+
+class HttpResponse(BaseModel):
+    code: int
+    message: str
+    data: UserInfo
+
+
+@app.get("/api/user/info")
+async def get_user_info():
+    return HttpResponse(
+        code=0,
+        message="ok",
+        data=UserInfo(
+            roles=["admin", "user"], 
+            realName="John Doe"
+        ),
+    )
 
 @app.get("/submit-task/")
 def submit_task():
