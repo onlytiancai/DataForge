@@ -23,4 +23,7 @@ Manage and maintain data in MySQL, including backups, restores, imports, exports
 
     celery -A celery_app worker --loglevel=info
     uvicorn main:app --reload
+    
+    cd vue-vben-admin
+    pnpm run dev:antd
 
