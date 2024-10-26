@@ -27,3 +27,18 @@ Manage and maintain data in MySQL, including backups, restores, imports, exports
     cd vue-vben-admin
     pnpm run dev:antd
 
+## pip install
+
+prod
+
+    python-multipart
+    passlib
+    jwt
+    pydantic_settings
+    tortoise-orm[asyncmy]
+    tortoise-orm
+    bcrypt
+
+dev
+    pytest
+    httpx
