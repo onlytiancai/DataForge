@@ -7,7 +7,14 @@ from pydantic import Field
 from fastapi import Query
 
 from .exceptions import HTTP_400_BAD_REQUEST
-from ..dependencies.pydantic import AllowExtraModelMixin, GenericModel
+from pydantic import BaseModel, ConfigDict
+GenericModel = BaseModel
+
+class AllowExtraModelMixin(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+class ORMModelMixin(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
 _T = TypeVar("_T")
 
