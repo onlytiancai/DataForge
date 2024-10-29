@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from pydantic import Extra,  Field
 
-from ..dependencies.pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class DataBaseSettings(BaseSettings):

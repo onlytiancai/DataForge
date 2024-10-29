@@ -25,20 +25,20 @@ class LoginRequest(BaseModel):
     """登录请求
     """
 
-    account: str = Field(description="账号")
+    username: str = Field(description="账号")
     password: str = Field(description="密码")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "account": "user1",
+                "username": "user1",
                 "password": "password12345"
             }
         }
 
-    @field_validator("account")
-    def validate_account(cls, value):
-        if validate.validate_account(value):
+    @field_validator("username")
+    def validate_username(cls, value):
+        if validate.validate_username(value):
             return value
 
     @field_validator("password")
@@ -52,9 +52,9 @@ class LoginResponse(BaseModel):
     """
 
     id: int = Field(description="账号ID")
-    account: str = Field(description="账号")
+    username: str = Field(description="账号")
     token_type: str = Field(default="bearer", description="令牌类型，默认为：bearer")
-    access_token: str = Field(description="JWT令牌")
+    accessToken: str = Field(description="JWT令牌")
     refresh_token: Optional[str] = Field(default=None, description="刷新令牌")
 
 
@@ -63,7 +63,7 @@ class ManagerLoginResponse(BaseModel):
     """
 
     id: int = Field(description="账号ID")
-    account: str = Field(description="账号")
+    username: str = Field(description="账号")
     token_type: str = Field(default="bearer", description="令牌类型，默认为：bearer")
     access_token: str = Field(description="JWT令牌")
     refresh_token: Optional[str] = Field(default=None, description="刷新令牌")

@@ -2,7 +2,7 @@ import secrets
 from functools import lru_cache
 from pydantic import Extra
 
-from ..dependencies.pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class AuthSettings(BaseSettings):

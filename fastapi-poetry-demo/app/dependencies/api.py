@@ -7,27 +7,13 @@ from pydantic import Field
 from fastapi import Query
 
 from .exceptions import HTTP_400_BAD_REQUEST
-from pydantic import BaseModel, ConfigDict
-GenericModel = BaseModel
+from pydantic import BaseModel
+_T = TypeVar("_T", bound=BaseModel)
 
-class AllowExtraModelMixin(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-class ORMModelMixin(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-_T = TypeVar("_T")
-
-
-class BaseApiSchema(AllowExtraModelMixin):
-    pass
-
-
-class BaseApiOut(BaseApiSchema, GenericModel, Generic[_T]):
-    status: int = Field(default=0, description="HTTP状态码")
-    msg: str = Field(default="success", description="状态描述")
+class BaseApiOut(BaseModel, Generic[_T]):
+    message: str = Field(default="ok", description="状态描述")
     data: Optional[_T] = Field(default=None, description="返回数据")
-    code: Optional[int] = Field(default=None, description="状态码")
+    code: Optional[int] = Field(default=0, description="状态码")
 
 
 @dataclass
@@ -89,7 +75,7 @@ class PagingRequest:
             raise HTTP_400_BAD_REQUEST
 
 
-class PagingResponse(BaseApiSchema, GenericModel, Generic[_T]):
+class PagingResponse(BaseModel, Generic[_T]):
     """分页回应
 
     Attributes:

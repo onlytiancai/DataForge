@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from pydantic import Field, Extra
 
-from ..dependencies.pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class OssSettings(BaseSettings):

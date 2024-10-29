@@ -33,7 +33,7 @@ prod
 
     python-multipart
     passlib
-    jwt
+    pyjwt
     pydantic_settings
     tortoise-orm[asyncmy]
     tortoise-orm

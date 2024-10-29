@@ -6,7 +6,7 @@ from starlette.status import HTTP_204_NO_CONTENT
 from app.dependencies.exceptions import HTTP_404_NOT_FOUND
 from app.models.user import User, extract_user_token
 from app.schemas.user import User_Pydantic, UserIn_Pydantic
-
+from app.dependencies.api import  BaseApiOut
 router = APIRouter()
 
 
@@ -39,6 +39,6 @@ async def delete_user(user_id: int, _: User = Depends(extract_user_token)):
         raise HTTP_404_NOT_FOUND
 
 
-@router.get("/users/me", summary='读取当前登录用户')
+@router.get("/api/user/info", response_model=BaseApiOut[User_Pydantic], summary='读取当前登录用户')
 async def read_users_me(current_user: User = Depends(extract_user_token)):
-    return current_user
+    return BaseApiOut[User_Pydantic](data=current_user)

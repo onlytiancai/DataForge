@@ -14,6 +14,7 @@ class User(BaseModel):
     account = fields.CharField(max_length=50, unique=True, description="账号名")
     password = fields.CharField(max_length=64, description="密码")
     name = fields.CharField(max_length=50, description="真实姓名")
+    refresh_token = fields.CharField(max_length=128, description="refresh_token")
 
     class Meta:
         table = "users"

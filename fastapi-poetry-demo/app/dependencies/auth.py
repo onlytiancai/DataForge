@@ -1,28 +1,28 @@
-from datetime import datetime, timedelta
-
+from datetime import datetime, timezone, timedelta
 import jwt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
+import bcrypt
 
 from ..configs.auth import get_auth_settings
 from .exceptions import HTTP_401_UNAUTHORIZED
 
 auth_settings = get_auth_settings()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # print(plain_password, hashed_password)
-    return pwd_context.verify(plain_password, hashed_password)
+    password_byte_enc = plain_password.encode('utf-8')
+    return bcrypt.checkpw(password = password_byte_enc , hashed_password = hashed_password.encode('utf-8'))
 
 
 def get_password_hash(password: str) -> str:
-    # print(password, pwd_context.hash(password))
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+    return hashed_password.decode('utf-8')
 
 
 def create_access_token(*, data: dict) -> str:
@@ -34,7 +34,7 @@ def create_access_token(*, data: dict) -> str:
 
     to_encode = data.copy()
 
-    expire = datetime.now(datetime.timezone.utc) + timedelta(
+    expire = datetime.now(timezone.utc) + timedelta(
         minutes=auth_settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode.update({"exp": expire})
