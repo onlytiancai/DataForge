@@ -6,19 +6,28 @@ import { Page } from '@vben/common-ui';
 import { Button } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+
 import { getDatabaseListApi } from '#/api';
 
 interface RowType {
-  id: string;
+  id: int;
   host: string;
   username: string;
 }
 
 const gridOptions: VxeGridProps<RowType> = {
+  checkboxConfig: {
+    highlight: true,
+    labelField: 'name',
+  },
   columns: [
-    { title: 'ID', type: 'seq', width: 50 },
-    { field: 'host', title: 'Host' },
-    { field: 'username', title: 'Username' },
+    
+    { field: 'id', title: 'Product Name' },
+    { field: 'host', title: 'Product Name' },
+    { field: 'username', title: 'Product Name' },
+
+
+
   ],
   height: 'auto',
   keepSource: true,
@@ -33,7 +42,11 @@ const gridOptions: VxeGridProps<RowType> = {
     },
   },
   toolbarConfig: {
+    custom: true,
+    // export: true,
+    // import: true,
     refresh: true,
+    zoom: true,
   },
 };
 
@@ -44,9 +57,9 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 <template>
   <Page auto-content-height>
-    <Grid table-title="Database" table-title-help="Managing Data Sources">
+    <Grid table-title="数据列表" table-title-help="提示">
       <template #toolbar-tools>
-        <Button type="primary" @click="() => gridApi.reload()">
+        <Button class="mr-2" type="primary" @click="() => gridApi.query()">
           Add
         </Button>
       </template>

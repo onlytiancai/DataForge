@@ -10,10 +10,16 @@ from app.schemas.user import User_Pydantic, UserIn_Pydantic
 from app.dependencies.api import  BaseApiOut
 router = APIRouter()
 
+from pydantic import BaseModel
 
-@router.get("/api/database/list", response_model=BaseApiOut[List[Database]])
+
+class PageOut(BaseModel):
+    total: int
+    items: List[Database]
+
+@router.get("/api/database/list", response_model=BaseApiOut[PageOut])
 async def get_users(_: User = Depends(extract_user_token)):
-    return BaseApiOut(data=[
+    return BaseApiOut(data=PageOut(total=2, items= [
         Database(id=1, host='192.168.1.1', username='user01'),
         Database(id=2, host='192.168.1.3', username='root')
-    ])
+    ]))
