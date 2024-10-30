@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import List, Generic, Optional, TypeVar
+from typing import List, Generic, Optional, TypeVar, Union
 
 from pydantic import Field
 
@@ -12,7 +12,7 @@ _T = TypeVar("_T", bound=BaseModel)
 
 class BaseApiOut(BaseModel, Generic[_T]):
     message: str = Field(default="ok", description="状态描述")
-    data: Optional[_T] = Field(default=None, description="返回数据")
+    data: Union[Optional[_T], List[_T]] = Field(default=None, description="返回数据")
     code: Optional[int] = Field(default=0, description="状态码")
 
 
