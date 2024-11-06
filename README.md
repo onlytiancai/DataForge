@@ -42,3 +42,17 @@ prod
 dev
     pytest
     httpx
+
+## links
+
+Is there any database backup solution with nice UI?
+https://www.reddit.com/r/selfhosted/comments/14ymkpv/is_there_any_database_backup_solution_with_nice_ui/
+
+https://github.com/eduardolat/pgbackweb?tab=readme-ov-file
+🐘 Effortless PostgreSQL backups with a user-friendly web interface! 🌐💾
+
+Aurora vs RDS: How to Choose the Right AWS Database Solution
+https://www.percona.com/blog/when-should-i-use-amazon-aurora-and-when-should-i-use-rds-mysql/
+
+MySQL Enterprise Backup
+https://www.mysql.com/products/enterprise/backup.html

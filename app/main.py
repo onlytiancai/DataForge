@@ -1,13 +1,31 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
 from celery.result import AsyncResult
-from celery_app import celery_app
-from celery_app import run_command
+from app.celery_app import celery_app
+from app.celery_app import run_command
+from fastapi.templating import Jinja2Templates
+from .models import create_db_and_tables
+from contextlib import asynccontextmanager
+
+from app.routers import include_router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print('init tables')
+    create_db_and_tables()
+    yield
+
+app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+include_router(app)
 
 
-app = FastAPI()
+
+templates = Jinja2Templates(directory="app/templates")
 
 class UserInfo(BaseModel):
     roles: List[str] = []
@@ -18,6 +36,19 @@ class HttpResponse(BaseModel):
     message: str
     data: UserInfo
 
+@app.get("/test", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse(request=request, name="test.html")
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="index.html", 
+        context={
+            'menu': 'home',
+            'title': 'Home',
+        }
+    )
 
 @app.get("/api/user/info")
 async def get_user_info():
