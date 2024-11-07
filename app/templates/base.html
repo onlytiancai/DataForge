@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
     <link href="{{ url_for('static', path='/lib/bootstrap-5.3.3/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', path='/lib/bootstrap-icons-1.11.3/bootstrap-icons.min.css') }}">
     {% block head %}
@@ -13,25 +14,15 @@
     <!--
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="{{ url_for('static', path='lib/bootstrap-5.3.3/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', path='/lib/vue.global.js') }}"></script>
+
+<script>
+    const API_URL = '';
+</script>
 </head>
 
-<body>
-    <div id="app">{{ message }}</div>
-
-    <script>
-      const { createApp, ref } = Vue
-    
-      createApp({
-        setup() {
-          const message = ref('Hello vue!')
-          return {
-            message
-          }
-        }
-      }).mount('#app')
-    </script>
-    
+<body>    
     <div class="d-flex">
         <div class="d-flex flex-column flex-shrink-0  p-2 bg-body-tertiary border-end sidebar" style="width: 280px;min-height: 100vh;">
             <a href="/"
@@ -109,7 +100,7 @@
 
     <div id="footer">
         {% block footer %}
-        <script src="{{ url_for('static', path='lib/bootstrap-5.3.3/bootstrap.bundle.min.js') }}"></script>
+
         {% endblock %}
     </div>
 </body>

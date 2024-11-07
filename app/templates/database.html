@@ -1,207 +1,190 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex justify-content-between">
-    <div>
-        <button type="button" class="btn btn-outline-primary">Add New DataSource3</button>
+{% raw %}
+<div id="app">
+    <div class="d-flex justify-content-between">
+        <div>
+            <button type="button" class="btn btn-outline-primary" @click="showAdd()">Add New DataSource</button>
+        </div>
+        <div>
+            <div class="input-group">
+                <input type="text" class="form-control">
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i
+                        class="bi bi-search"></i></button>
+            </div>
+        </div>
     </div>
-    <div>
-        <div class="input-group">
-            <input type="text" class="form-control">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i
-                    class="bi bi-search"></i></button>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">User</th>
+                <th scope="col">Host</th>
+                <th scope="col" width="100">Operators</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(row, i) in rows">
+                <th scope="row">{{ i }}</th>
+                <td>{{ row.user }}</td>
+                <td>{{ row.host }}:{{ row.port }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary" @click="showEdit(row)">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @click="showDel(row)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <nav>
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="modal" tabindex="-1" ref="modalDelete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete DataSource</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{row.user}}@{{row.host}}:{{row.port}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" @click="del">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" ref="modalForm" tabindex=" -1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">{{form_title}}</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="txtUser" class="col-form-label">User:</label>
+                            <input type="text" class="form-control" id="txtUser" v-model="row.user">
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtPassword" class="col-form-label">Password:</label>
+                            <input type="password" class="form-control" id="txtPassword" v-model="row.password">
+                        </div>                        
+                        <div class="mb-3">
+                            <label for="txtHost" class="col-form-label">Host:</label>
+                            <input type="text" class="form-control" id="txtHost" v-model="row.host">
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtPort" class="col-form-label">Port:</label>
+                            <input type="text" class="form-control" id="txtPort" v-model="row.port">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" @click="save()">Save</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">User</th>
-            <th scope="col">Host</th>
-            <th scope="col">Database</th>
-            <th scope="col" width="100">Operators</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>192.168.1.1</td>
-            <td>product-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>192.168.1.2</td>
-            <td>user-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td>Mark</td>
-            <td>192.168.1.1</td>
-            <td>product-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">4</th>
-            <td>Jacob</td>
-            <td>192.168.1.2</td>
-            <td>user-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">5</th>
-            <td>Mark</td>
-            <td>192.168.1.1</td>
-            <td>product-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">6</th>
-            <td>Jacob</td>
-            <td>192.168.1.2</td>
-            <td>user-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">7</th>
-            <td>Mark</td>
-            <td>192.168.1.1</td>
-            <td>product-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">8</th>
-            <td>Jacob</td>
-            <td>192.168.1.2</td>
-            <td>user-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">8</th>
-            <td>Jacob</td>
-            <td>192.168.1.2</td>
-            <td>user-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">8</th>
-            <td>Jacob</td>
-            <td>192.168.1.2</td>
-            <td>user-db</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>                
-    </tbody>
 
-</table>
 
-<nav>
-    <ul class="pagination">
-      <li class="page-item">
-        <a class="page-link" href="#" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <li class="page-item"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item">
-        <a class="page-link" href="#" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
+{% endraw %}
+<script>
+    const { createApp, ref, onMounted, useTemplateRef, watchEffect } = Vue;
+    createApp({
+        setup() {
+            const form_title = ref('');
+            const row = ref({ user: '', host: '', port: 3306, password:'' })
+            const rows = ref([]);
+            const modalFormDom = useTemplateRef('modalForm')
+            const modalDeleteDom = useTemplateRef('modalDelete')
+            let modalForm, modalDelete;
+            async function loadData() {
+                const response = await fetch(`${API_URL}/api/database`);
+                const result = await response.json();
+                rows.value = result;
+            } 
+            function showAdd() {
+                form_title.value = 'Add New Datasource'
+                modalForm.show()
+            }
+            async function save() {
+                console.log(row.value.id, !row.id)
+                if (!row.value.id) {
+                    const response = await fetch(`${API_URL}/api/database`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(row.value)
+                    });
+                  
+                } else {
+                    const response = await fetch(`${API_URL}/api/database/${row.value.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(row.value)
+                    });                   
+                }
+                modalForm.hide();
+                await loadData();
+            }
+            function showEdit(data) {
+                form_title.value = 'Edit Datasource'
+                row.value = data
+                modalForm.show()
+            }
+            function showDel(data) {
+                row.value = data
+                modalDelete.show()
+            }
+            async function del() {
+                const response = await fetch(`${API_URL}/api/database/${row.value.id}`, {
+                        method: 'DELETE',
+                    });  
+                    modalDelete.hide();
+                    await loadData();
+            }
+            onMounted(async () => {   
+                await loadData();
+            })
+            watchEffect(() => {
+                if (modalFormDom.value) {
+                    modalForm = new bootstrap.Modal(modalFormDom.value, {})
+                } 
+                if (modalDeleteDom.value) {
+                    modalDelete = new bootstrap.Modal(modalDeleteDom.value, {})
+                } 
+            })
+            return {
+                form_title, rows, row, showAdd, showEdit, showDel, del, save,
+            };
+        }
+    }).mount('#app');
+</script>
 {% endblock %}
