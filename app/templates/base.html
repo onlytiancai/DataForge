@@ -14,73 +14,130 @@
     <!--
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 -->
-<script src="{{ url_for('static', path='lib/bootstrap-5.3.3/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ url_for('static', path='/lib/vue.global.js') }}"></script>
+    <script src="{{ url_for('static', path='lib/bootstrap-5.3.3/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/lib/vue.global.js') }}"></script>
 
-<script>
-    const API_URL = '';
-</script>
+    <style>
+        .btn-toggle {
+            display: inline-flex;
+            padding: .25rem .5rem;
+            font-weight: 600;
+            border: 0;
+            width: 100%;
+        }
+        .btn-toggle:hover,
+        .btn-toggle:focus {
+            background-color: #d2f4ea;
+        }
+        .btn-toggle::after {
+            width: 1.25em;
+            line-height: 0;
+            content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+            transition: transform .35s ease;
+            transform-origin: .5em 50%;
+        }
+        .btn-toggle[aria-expanded="true"]::after {
+            transform: rotate(90deg);
+        }
+        .btn-toggle-nav a {
+            display: inline-flex;
+            padding: .1875rem .5rem;
+            margin-top: .125rem;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .btn-toggle-nav a.active,
+        .btn-toggle-nav a:hover,
+        .btn-toggle-nav a:focus {
+            background-color: #d2f4ea;
+        }
+    </style>
+    <script>
+        const API_URL = '';
+    </script>
 </head>
 
-<body>    
+<body>
     <div class="d-flex">
-        <div class="d-flex flex-column flex-shrink-0  p-2 bg-body-tertiary border-end sidebar" style="width: 280px;min-height: 100vh;">
+        <div class="d-flex flex-column flex-shrink-0  p-2 bg-body-tertiary border-end sidebar"
+            style="width: 280px;min-height: 100vh;">
             <a href="/"
                 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-database-check me-2" viewBox="0 0 16 16">
-                    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514"/>
-                    <path d="M12.096 6.223A5 5 0 0 0 13 5.698V7c0 .289-.213.654-.753 1.007a4.5 4.5 0 0 1 1.753.25V4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16c.536 0 1.058-.034 1.555-.097a4.5 4.5 0 0 1-.813-.927Q8.378 15 8 15c-1.464 0-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13h.027a4.6 4.6 0 0 1 0-1H8c-1.464 0-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10q.393 0 .774-.024a4.5 4.5 0 0 1 1.102-1.132C9.298 8.944 8.666 9 8 9c-1.464 0-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777M3 4c0-.374.356-.875 1.318-1.313C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4"/>
-                  </svg>              
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    class="bi bi-database-check me-2" viewBox="0 0 16 16">
+                    <path
+                        d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514" />
+                    <path
+                        d="M12.096 6.223A5 5 0 0 0 13 5.698V7c0 .289-.213.654-.753 1.007a4.5 4.5 0 0 1 1.753.25V4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16c.536 0 1.058-.034 1.555-.097a4.5 4.5 0 0 1-.813-.927Q8.378 15 8 15c-1.464 0-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13h.027a4.6 4.6 0 0 1 0-1H8c-1.464 0-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10q.393 0 .774-.024a4.5 4.5 0 0 1 1.102-1.132C9.298 8.944 8.666 9 8 9c-1.464 0-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777M3 4c0-.374.356-.875 1.318-1.313C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4" />
+                </svg>
                 <span class="fs-4">DataForge</span>
             </a>
             <hr>
-  
-            <ul class="nav nav-pills flex-column">
-                <li class="nav-item">
-                    <a href="/" class="nav-link {% if menu=='home' %} active {%else%} link-body-emphasis {% endif %}">
-                        <i class="bi bi-house-door"></i>
-                        Home
-                    </a>
+            <ul class="list-unstyled ps-0">
+                <li class="mb-1">
+                    <ul class="btn-toggle-nav list-unstyled  pb-1">
+                        <li>
+                            <a href="/" class="link-dark rounded {% if menu=='home' %} active {% endif %}">
+                                <i class="bi bi-house-door me-2"></i>
+                                Home
+                            </a>
+                        </li>
+                    </ul>
                 </li>
-            </ul>
-            <hr>
-            <span class="text-secondary small">Migrates</span>  
-            <ul class="nav nav-pills flex-column">
-                <li>
-                    <a href="#" class="nav-link link-body-emphasis">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                        Exports
-                    </a>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse"
+                        data-bs-target="#dashboard-collapse" aria-expanded="true">
+                        <span class="me-auto">Migrates</span>
+                    </button>
+                    <div class="collapse show" id="dashboard-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 ">
+                            <li><a href="#" class="link-dark rounded"><i class="bi bi-box-arrow-up-right me-2"></i>
+                                    Exports</a></li>
+                            <li><a href="#" class="link-dark rounded"><i class="bi bi-box-arrow-in-up-right me-2"></i>
+                                    Imports</a></li>
+                            <li><a href="#" class="link-dark rounded"><i class="bi bi-list-task me-2"></i>
+                                    Tasks</a></li>
+                        </ul>
+                    </div>
                 </li>
-                <li>
-                    <a href="#" class="nav-link link-body-emphasis">
-                        <i class="bi bi-box-arrow-in-up-right"></i>
-                        Imports
-                    </a>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse"
+                        data-bs-target="#account-collapse" aria-expanded="true">
+                        <span class="me-auto">Basic Info</span>
+                    </button>
+                    <div class="collapse show" id="account-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
+                            <li>
+                                <a href="#" class="link-dark rounded">
+                                    <i class="bi bi-folder me-2"></i>
+                                    Folders</a>
+                            </li>
+                            <li>
+                                <a href="/database"
+                                    class="link-dark rounded {% if menu=='database' %} active {% endif %}">
+                                    <i class="bi bi-database me-2"></i>
+                                    Database
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
-                <li>
-                    <a href="#" class="nav-link link-body-emphasis">
-                        <i class="bi bi-list-task"></i>
-                        Tasks
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            <span class="text-secondary small">Basic Info</span>
-            <ul class="nav nav-pills flex-column">
-                <li>
-                    <a href="#" class="nav-link link-body-emphasis">
-                        <i class="bi bi-folder"></i>
-                        Folders
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/database/" class="nav-link {% if menu=='database' %} active {%else%} link-body-emphasis {% endif %}">
-                        <i class="bi bi-database"></i>
-                        Databases
-                    </a>
-                </li>
+                <li class="border-top my-3"></li>
+                <ul class="btn-toggle-nav list-unstyled  pb-1">
+                    <li>
+                        <a href="/" class="link-dark rounded {% if menu=='home' %} active {% endif %}">
+                            <i class="bi bi-person me-2"></i>
+                            Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/" class="link-dark rounded {% if menu=='home' %} active {% endif %}">
+                            <i class="bi bi-box-arrow-left me-2"></i>
+                            Sign out
+                        </a>
+                    </li>
+                </ul>
             </ul>
         </div>
         <div class="main p-2 bg-white ms-2 flex-grow-1">
