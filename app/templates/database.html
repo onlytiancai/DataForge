@@ -4,7 +4,9 @@
 <div id="app">
     <div class="d-flex justify-content-between">
         <div>
-            <button type="button" class="btn btn-outline-primary" @click="showAdd()">Add New DataSource</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" @click="showAdd()">Add New DataSource</button>
+            <button type="button" class="ms-2 btn btn-outline-primary btn-sm" @click="loadData"><i
+                    class="bi bi-arrow-clockwise"></i></button>
         </div>
         <div>
             <div class="input-group">
@@ -14,7 +16,13 @@
             </div>
         </div>
     </div>
-    <table class="table table-hover">
+
+
+    <div class="spinner-border m-5" role="status" v-if="loading">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+
+    <table class="table table-hover" v-if="!loading">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -43,7 +51,7 @@
 
     </table>
 
-    <nav>
+    <nav v-if="!loading">
         <ul class="pagination">
             <li class="page-item">
                 <a class="page-link" href="#" aria-label="Previous">
@@ -60,6 +68,7 @@
             </li>
         </ul>
     </nav>
+
     <div class="modal" tabindex="-1" ref="modalDelete">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -72,7 +81,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" @click="del">Delete</button>
+                    <button type="button" class="btn btn-primary" @click="del" :disabled="deleting">
+                        <span v-if="deleting" class="spinner-border spinner-border-sm"></span>
+                        Delete
+                    </button>
                 </div>
             </div>
         </div>
@@ -85,30 +97,41 @@
                     <h1 class="modal-title fs-5" id="exampleModalLabel">{{form_title}}</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form>
+                <form novalidate class="needs-validation" :class= "{'was-validated': was_validated}" @submit.stop.prevent="save">
+                    <div class="modal-body">
                         <div class="mb-3">
                             <label for="txtUser" class="col-form-label">User:</label>
-                            <input type="text" class="form-control" id="txtUser" v-model="row.user">
+                            <input type="text" class="form-control" id="txtUser" v-model="row.user" required>
+                            <div class="invalid-feedback">
+                                please input user
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="txtPassword" class="col-form-label">Password:</label>
-                            <input type="password" class="form-control" id="txtPassword" v-model="row.password">
-                        </div>                        
+                            <input type="password" class="form-control" id="txtPassword" v-model="row.password"
+                                required>
+                        </div>
                         <div class="mb-3">
                             <label for="txtHost" class="col-form-label">Host:</label>
-                            <input type="text" class="form-control" id="txtHost" v-model="row.host">
+                            <input type="text" class="form-control" id="txtHost" v-model="row.host" required>
                         </div>
                         <div class="mb-3">
                             <label for="txtPort" class="col-form-label">Port:</label>
-                            <input type="text" class="form-control" id="txtPort" v-model="row.port">
+                            <input type="text" class="form-control" id="txtPort" v-model="row.port" required pattern="^[0-9]{3,}$">
+                            <div class="invalid-feedback">
+                                please input correct port
+                            </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" @click="save()">Save</button>
-                </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" :disabled="saving">
+                            <span v-if="saving" class="spinner-border spinner-border-sm"></span>
+                            Save
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -121,40 +144,58 @@
     createApp({
         setup() {
             const form_title = ref('');
-            const row = ref({ user: '', host: '', port: 3306, password:'' })
+            const saving = ref(false);
+            const deleting = ref(false);
+            const loading = ref(false);
+            const was_validated = ref(false);
+            const row = ref({ user: '', host: '', port: 3306, password: '' })
             const rows = ref([]);
             const modalFormDom = useTemplateRef('modalForm')
             const modalDeleteDom = useTemplateRef('modalDelete')
             let modalForm, modalDelete;
             async function loadData() {
+                loading.value = true;
                 const response = await fetch(`${API_URL}/api/database`);
                 const result = await response.json();
+                loading.value = false;
                 rows.value = result;
-            } 
+            }
             function showAdd() {
+                was_validated.value = false;
+                row.value = {}
                 form_title.value = 'Add New Datasource'
                 modalForm.show()
             }
-            async function save() {
-                console.log(row.value.id, !row.id)
+            async function save(event) {
+                if (event) {                  
+                    const form = event.target;   
+                    was_validated.value = true;                 
+                    if (!form.checkValidity()) {
+                        return;
+                    }
+                    
+                }                
+                saving.value = true;
                 if (!row.value.id) {
                     const response = await fetch(`${API_URL}/api/database`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(row.value)
                     });
-                  
+
                 } else {
                     const response = await fetch(`${API_URL}/api/database/${row.value.id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(row.value)
-                    });                   
+                    });
                 }
+                saving.value = false;
                 modalForm.hide();
                 await loadData();
             }
             function showEdit(data) {
+                was_validated.value = false;
                 form_title.value = 'Edit Datasource'
                 row.value = data
                 modalForm.show()
@@ -164,25 +205,28 @@
                 modalDelete.show()
             }
             async function del() {
+                deleting.value = true;
                 const response = await fetch(`${API_URL}/api/database/${row.value.id}`, {
-                        method: 'DELETE',
-                    });  
-                    modalDelete.hide();
-                    await loadData();
+                    method: 'DELETE',
+                });
+                deleting.value = false;
+                modalDelete.hide();
+                await loadData();
             }
-            onMounted(async () => {   
+            onMounted(async () => {
                 await loadData();
             })
             watchEffect(() => {
                 if (modalFormDom.value) {
                     modalForm = new bootstrap.Modal(modalFormDom.value, {})
-                } 
+                }
                 if (modalDeleteDom.value) {
                     modalDelete = new bootstrap.Modal(modalDeleteDom.value, {})
-                } 
+                }
             })
             return {
-                form_title, rows, row, showAdd, showEdit, showDel, del, save,
+                form_title, rows, row, loadData, showAdd, showEdit, showDel, del, save,
+                saving, deleting, loading, was_validated, 
             };
         }
     }).mount('#app');
