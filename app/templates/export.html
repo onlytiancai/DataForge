@@ -4,7 +4,7 @@
 <div id="app">
     <div class="d-flex justify-content-between">
         <div>
-            <button type="button" class="btn btn-outline-primary btn-sm" @click="showAdd()">Add New DataSource</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" @click="showAdd()">Add New Exports</button>
             <button type="button" class="ms-2 btn btn-outline-primary btn-sm" @click="loadData"><i
                     class="bi bi-arrow-clockwise"></i></button>
         </div>
@@ -25,21 +25,22 @@
     <div v-if="!loading && rows.length == 0">
         There's no data.
     </div>
-
-    <table class="table table-hover" v-if="!loading  && rows.length > 0">
+    <table class="table table-hover" v-if="!loading && rows.length > 0">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">User</th>
-                <th scope="col">Host</th>
+                <th scope="col">Database</th>
+                <th scope="col">Dir</th>
+                <th scope="col">Tables</th>
                 <th scope="col" width="100">Operators</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="(row, i) in rows">
-                <th scope="row">{{ i }}</th>
-                <td>{{ row.user }}</td>
-                <td>{{ row.host }}:{{ row.port }}</td>
+                <th scope="row">{{ row.id }}</th>
+                <td>{{ row.database_id }}</td>
+                <td>{{ row.output_dir }}</td>
+                <td>{{ row.tables }}</td>
                 <td>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-outline-secondary" @click="showEdit(row)">
@@ -55,7 +56,7 @@
 
     </table>
 
-    <nav v-if="!loading  && rows.length > 0">
+    <nav v-if="!loading && rows.length > 0">
         <ul class="pagination">
             <li class="page-item">
                 <a class="page-link" href="#" aria-label="Previous">
@@ -104,29 +105,20 @@
                 <form novalidate class="needs-validation" :class= "{'was-validated': was_validated}" @submit.stop.prevent="save">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="txtUser" class="col-form-label">User:</label>
-                            <input type="text" class="form-control" id="txtUser" v-model="row.user" required>
-                            <div class="invalid-feedback">
-                                please input user
-                            </div>
+                            <label for="txtDatabase" class="col-form-label">Database:</label>
+                            <select class="form-select" v-model="row.database_id">
+                                <option v-bind:value="row.id" v-for="(row, i) in databases">{{ row.host }}:{{ row.port }}</option>
+                              </select>
                         </div>
                         <div class="mb-3">
-                            <label for="txtPassword" class="col-form-label">Password:</label>
-                            <input type="password" class="form-control" id="txtPassword" v-model="row.password"
+                            <label for="txtDir" class="col-form-label">Dir:</label>
+                            <input type="text" class="form-control" id="txtDir" v-model="row.output_dir"
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label for="txtHost" class="col-form-label">Host:</label>
-                            <input type="text" class="form-control" id="txtHost" v-model="row.host" required>
+                            <label for="txtTables" class="col-form-label">Tables:</label>
+                            <input type="text" class="form-control" id="txtTables" v-model="row.tables" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="txtPort" class="col-form-label">Port:</label>
-                            <input type="text" class="form-control" id="txtPort" v-model="row.port" required pattern="^[0-9]{3,}$">
-                            <div class="invalid-feedback">
-                                please input correct port
-                            </div>
-                        </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -156,10 +148,11 @@
             const rows = ref([]);
             const modalFormDom = useTemplateRef('modalForm')
             const modalDeleteDom = useTemplateRef('modalDelete')
+            const databases = ref([])
             let modalForm, modalDelete;
             async function loadData() {
                 loading.value = true;
-                const response = await fetch(`${API_URL}/api/database`);
+                const response = await fetch(`${API_URL}/api/export`);
                 const result = await response.json();
                 loading.value = false;
                 rows.value = result;
@@ -181,14 +174,14 @@
                 }                
                 saving.value = true;
                 if (!row.value.id) {
-                    const response = await fetch(`${API_URL}/api/database`, {
+                    const response = await fetch(`${API_URL}/api/export`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(row.value)
                     });
 
                 } else {
-                    const response = await fetch(`${API_URL}/api/database/${row.value.id}`, {
+                    const response = await fetch(`${API_URL}/api/export/${row.value.id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(row.value)
@@ -210,7 +203,7 @@
             }
             async function del() {
                 deleting.value = true;
-                const response = await fetch(`${API_URL}/api/database/${row.value.id}`, {
+                const response = await fetch(`${API_URL}/api/export/${row.value.id}`, {
                     method: 'DELETE',
                 });
                 deleting.value = false;
@@ -219,6 +212,9 @@
             }
             onMounted(async () => {
                 await loadData();
+                const response = await fetch(`${API_URL}/api/database`);
+                const result = await response.json();
+                databases.value = result;
             })
             watchEffect(() => {
                 if (modalFormDom.value) {
@@ -230,7 +226,7 @@
             })
             return {
                 form_title, rows, row, loadData, showAdd, showEdit, showDel, del, save,
-                saving, deleting, loading, was_validated, 
+                saving, deleting, loading, was_validated, databases, 
             };
         }
     }).mount('#app');
