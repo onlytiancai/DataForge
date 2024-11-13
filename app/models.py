@@ -1,6 +1,7 @@
 from typing import Optional
-from sqlalchemy import DateTime, func
-from sqlmodel import Field, Column, SQLModel, create_engine
+from sqlalchemy import DateTime, func, text
+from sqlalchemy.exc import OperationalError
+from sqlmodel import Field, Column, SQLModel, create_engine, Session
 import datetime
 
 
@@ -10,6 +11,18 @@ class Database(SQLModel, table=True):
     host: str
     port: int
     password: str
+    database: str
+
+    def test(self) -> bool:
+        database_url = f"mysql+pymysql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+        engine = create_engine(database_url)
+
+        try:
+            with Session(engine) as session:
+                session.exec(text("SELECT 1"))
+            return True
+        except OperationalError as e:
+            return False            
 
 class Export(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

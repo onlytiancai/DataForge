@@ -49,6 +49,13 @@ def delete_database(database_id: int):
         session.commit()
         return {"message": "Database deleted successfully"}        
     
+@router.post("/api/database/test", response_model=dict)
+def test_database(database: Database):
+    if database.test():
+        return {'code': 0, 'message': 'ok'}
+    else:
+        raise HTTPException(status_code=400, detail="test faild")
+        
 @router.get("/database/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(

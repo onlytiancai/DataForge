@@ -120,6 +120,10 @@
                             <input type="text" class="form-control" id="txtHost" v-model="row.host" required>
                         </div>
                         <div class="mb-3">
+                            <label for="txtDatabase" class="col-form-label">Database:</label>
+                            <input type="text" class="form-control" id="txtDatabase" v-model="row.database" required>
+                        </div>                        
+                        <div class="mb-3">
                             <label for="txtPort" class="col-form-label">Port:</label>
                             <input type="text" class="form-control" id="txtPort" v-model="row.port" required pattern="^[0-9]{3,}$">
                             <div class="invalid-feedback">
@@ -129,8 +133,13 @@
 
                     </div>
                     <div class="modal-footer">
+                        <span>{{test_message}}</span>
+                        <button type="button" class="btn btn-secondary"  @click="testDatabase" :disabled="testing">
+                            <span v-if="testing" class="spinner-border spinner-border-sm"></span>
+                            Test
+                        </button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" :disabled="saving">
+                        <button type="submit" class="btn btn-primary" :disabled="saving || !test_ok">
                             <span v-if="saving" class="spinner-border spinner-border-sm"></span>
                             Save
                         </button>
@@ -148,14 +157,18 @@
     createApp({
         setup() {
             const form_title = ref('');
+            const test_message = ref('');
+            const test_ok = ref(false);
             const saving = ref(false);
+            const testing =  ref(false);
             const deleting = ref(false);
             const loading = ref(false);
             const was_validated = ref(false);
-            const row = ref({ user: '', host: '', port: 3306, password: '' })
+            const row = ref({ })
             const rows = ref([]);
             const modalFormDom = useTemplateRef('modalForm')
             const modalDeleteDom = useTemplateRef('modalDelete')
+            
             let modalForm, modalDelete;
             async function loadData() {
                 loading.value = true;
@@ -165,11 +178,30 @@
                 rows.value = result;
             }
             function showAdd() {
+                testing.value = false;
                 was_validated.value = false;
-                row.value = {}
+                row.value = {port: 3306}
                 form_title.value = 'Add New Datasource'
                 modalForm.show()
             }
+            async function testDatabase() {
+                try {                    
+                    testing.value = true;
+                    const response = await fetch(`${API_URL}/api/database/test`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(row.value)
+                    });
+                    testing.value = false;
+                    test_ok.value = response.ok;
+                    const result = await response.json();
+                    test_message.value =  response.ok ? result.message : result.detail;
+                } catch (error) {
+                    test_message.value = error.message;
+                }
+
+            }
+
             async function save(event) {
                 if (event) {                  
                     const form = event.target;   
@@ -199,6 +231,7 @@
                 await loadData();
             }
             function showEdit(data) {
+                test_ok.value = false;
                 was_validated.value = false;
                 form_title.value = 'Edit Datasource'
                 row.value = data
@@ -230,7 +263,7 @@
             })
             return {
                 form_title, rows, row, loadData, showAdd, showEdit, showDel, del, save,
-                saving, deleting, loading, was_validated, 
+                saving, deleting, loading, was_validated, test_message, test_ok,testDatabase, testing,
             };
         }
     }).mount('#app');
